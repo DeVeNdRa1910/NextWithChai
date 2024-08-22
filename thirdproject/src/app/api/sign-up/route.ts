@@ -46,6 +46,8 @@ export async function POST(request: Request) {
         existingUserByEmail.verifyCodeExpiry = new Date(Date.now()+3600000);
 
         await existingUserByEmail.save()
+
+        await sendVerificationEmail(email, username, verifyCode.toString() )
       }
 
     } else {
@@ -65,6 +67,8 @@ export async function POST(request: Request) {
         messages: [],
       });
 
+      await sendVerificationEmail(email, username, verifyCode.toString())
+
       await newUser.save()
       
     }
@@ -74,11 +78,13 @@ export async function POST(request: Request) {
 
     if(!emailResponse.success){
       return Response.json({
-        success: false,
-        message: emailResponse.message
-      },{
-        status: 500
-      })
+          success: false,
+          message: emailResponse.message
+        },
+        {
+          status: 500
+        }
+      )
     }
 
     return Response.json({
